@@ -5,49 +5,46 @@ import { authAPI } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 
-const Login = () => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
   const { login } = useAuth();
 
-  // Check for redirect after login
-  const from = location.state?.from?.pathname || '/';
+  const from = (location.state as any)?.from || '/';
 
   useEffect(() => {
-    // Clear any previous error messages when component mounts
     setError('');
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    // Basic validation
+
     if (!email || !password) {
-      setError('Please enter both email and password');
+      setError(t('auth.enterEmailPassword') || 'Please enter email and password');
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
-      // Call the login API
+      // Ensure authAPI.login returns { user, token }
       const userData = await authAPI.login({ email, password });
-      
-      // Update auth context
-      login(userData);
-      
-      // Redirect to the intended page or home
+      login(userData); // update context
       navigate(from, { replace: true });
-      
     } catch (err: any) {
       console.error('Login error:', err);
-      const errorMessage = err?.response?.data?.message || err.message || 'Login failed. Please try again.';
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        t('auth.loginFailed') ||
+        'Login failed. Please try again.';
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -68,13 +65,22 @@ const Login = () => {
             </Link>
           </p>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <div className="ml-3">
@@ -83,7 +89,7 @@ const Login = () => {
             </div>
           </div>
         )}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
@@ -161,7 +167,7 @@ const Login = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                  {t('auth.loggingIn')}
+                  {t('auth.loggingIn') || 'Logging in...'}
                 </>
               ) : (
                 t('auth.login')

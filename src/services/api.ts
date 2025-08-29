@@ -11,12 +11,6 @@ export interface User {
   token?: string;
 }
 
-interface ApiResponse<T = any> {
-  data: T;
-  message?: string;
-  errors?: Array<{ msg: string; param?: string }>;
-}
-
 // Create axios instance
 const api = axios.create({
   baseURL: API_URL,
@@ -42,8 +36,8 @@ api.interceptors.request.use(
 export const authAPI = {
   // Get user profile
   getProfile: async (): Promise<User> => {
-    const response = await api.get<ApiResponse<User>>('/auth/profile');
-    return response.data.data;
+    const response = await api.get<User>('/auth/profile');
+    return response.data;
   },
 
   // Register a new user
@@ -54,8 +48,8 @@ export const authAPI = {
     address: string;
     password: string;
   }): Promise<{ user: User; token: string }> => {
-    const response = await api.post<ApiResponse<{ user: User; token: string }>>('/auth/register', userData);
-    const { user, token } = (response.data as ApiResponse<{ user: User; token: string }>).data;
+    const response = await api.post<{ user: User; token: string }>('/auth/register', userData);
+    const { user, token } = response.data;
     if (token) {
       localStorage.setItem('token', token);
     }
@@ -64,8 +58,8 @@ export const authAPI = {
 
   // Login user
   login: async (credentials: { email: string; password: string }): Promise<{ user: User; token: string }> => {
-    const response = await api.post<ApiResponse<{ user: User; token: string }>>('/auth/login', credentials);
-    const { user, token } = (response.data as ApiResponse<{ user: User; token: string }>).data;
+    const response = await api.post<{ user: User; token: string }>('/auth/login', credentials);
+    const { user, token } = response.data;
     if (token) {
       localStorage.setItem('token', token);
     }

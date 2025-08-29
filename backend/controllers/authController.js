@@ -4,6 +4,9 @@ const { validationResult } = require('express-validator');
 
 // Generate JWT Token
 const generateToken = (id) => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not defined in .env');
+  }
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: '30d', // Token expires in 30 days
   });
@@ -28,17 +31,11 @@ exports.register = async (req, res, next) => {
     }
 
     // Create user
-    const user = await User.create({
-      name,
-      email,
-      phone,
-      address,
-      password,
-    });
+    const user = await User.create({ name, email, phone, address, password });
 
     if (user) {
       const token = generateToken(user._id);
-      
+
       // Set HTTP-only cookie
       res.cookie('token', token, {
         httpOnly: true,
@@ -48,10 +45,12 @@ exports.register = async (req, res, next) => {
       });
 
       res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
         token,
       });
     } else {
@@ -69,12 +68,12 @@ exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Check for user email
+    // Find user by email
     const user = await User.findOne({ email }).select('+password');
 
     if (user && (await user.comparePassword(password))) {
       const token = generateToken(user._id);
-      
+
       // Set HTTP-only cookie
       res.cookie('token', token, {
         httpOnly: true,
@@ -84,10 +83,12 @@ exports.login = async (req, res, next) => {
       });
 
       res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
         token,
       });
     } else {
@@ -114,9 +115,13 @@ exports.logout = (req, res) => {
 // @access  Private
 exports.getUserProfile = async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
     const user = await User.findById(req.user.id).select('-password');
     if (user) {
-      res.json(user);
+      res.json({ user });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
