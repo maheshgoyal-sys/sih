@@ -9,6 +9,11 @@ const FarmerDashboard: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('FarmerDashboard - User data:', user);
+  }, [user]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -33,14 +38,13 @@ const FarmerDashboard: React.FC = () => {
       {/* Farmer Profile Section */}
       <div className="p-6 border-b border-gray-100 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="text-center">
-          <div className="text-xs text-gray-500 mb-1">organic farm</div>
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-semibold text-2xl mx-auto mb-3">
             {user?.name?.charAt(0) || 'F'}
           </div>
           <div className="text-sm text-gray-600 mb-1">Welcome back,</div>
           <div className="text-lg font-bold text-gray-900 mb-3">{user?.name || 'Farmer Name'}</div>
-          <div className="text-xs text-gray-500">ID: {user?._id?.slice(-6) || 'FARM001'}</div>
-          <div className="text-xs text-gray-500">Village: {user?.email?.split('@')[0] || 'Village Name'}</div>
+          <div className="text-xs text-gray-500 mb-1">ID: {user?.aadhaarNumber || 'Aadhaar Number'}</div>
+          <div className="text-xs text-gray-500 mb-1">Village: {user?.village || 'Village Name'}</div>
         </div>
       </div>
       
@@ -48,6 +52,10 @@ const FarmerDashboard: React.FC = () => {
         <Link to="/farmer" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700">
           <LayoutDashboard className="h-5 w-5" />
           <span>Dashboard</span>
+        </Link>
+        <Link to="/risk-checker" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700">
+          <Shield className="h-5 w-5" />
+          <span>Risk Checker</span>
         </Link>
         <Link to="/alerts" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700">
           <Bell className="h-5 w-5" />
@@ -112,14 +120,13 @@ const FarmerDashboard: React.FC = () => {
               {/* Farmer Profile Section - Mobile */}
               <div className="p-6 border-b border-gray-100 bg-gradient-to-br from-gray-50 to-blue-50">
                 <div className="text-center">
-                  <div className="text-xs text-gray-500 mb-1">organic farm</div>
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-semibold text-2xl mx-auto mb-3">
                     {user?.name?.charAt(0) || 'F'}
                   </div>
                   <div className="text-sm text-gray-600 mb-1">Welcome back,</div>
                   <div className="text-lg font-bold text-gray-900 mb-3">{user?.name || 'Farmer Name'}</div>
-                  <div className="text-xs text-gray-500">ID: {user?._id?.slice(-6) || 'FARM001'}</div>
-                  <div className="text-xs text-gray-500">Village: {user?.email?.split('@')[0] || 'Village Name'}</div>
+                  <div className="text-xs text-gray-500 mb-1">ID: {user?.aadhaarNumber || 'Aadhaar Number'}</div>
+                  <div className="text-xs text-gray-500 mb-1">Village: {user?.village || 'Village Name'}</div>
                 </div>
               </div>
               
@@ -127,6 +134,10 @@ const FarmerDashboard: React.FC = () => {
                 <Link to="/farmer" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700" onClick={() => setIsMobileSidebarOpen(false)}>
                   <LayoutDashboard className="h-5 w-5" />
                   <span>Dashboard</span>
+                </Link>
+                <Link to="/risk-checker" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700" onClick={() => setIsMobileSidebarOpen(false)}>
+                  <Shield className="h-5 w-5" />
+                  <span>Risk Checker</span>
                 </Link>
                 <Link to="/alerts" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700" onClick={() => setIsMobileSidebarOpen(false)}>
                   <Bell className="h-5 w-5" />
@@ -169,7 +180,7 @@ const FarmerDashboard: React.FC = () => {
               {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
                   <div className="px-4 py-2 text-sm text-gray-600 border-b">Signed in as<br /><span className="font-medium text-gray-800">{user?.email || 'farmer@example.com'}</span></div>
-                  <Link to="#" className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  <Link to="/profile" className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                     <UserIcon className="h-4 w-4" />
                     <span>Profile</span>
                   </Link>
@@ -184,8 +195,18 @@ const FarmerDashboard: React.FC = () => {
 
           <div className="px-6 pb-10">
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+               <div className="flex justify-between items-center mb-6">
+                 <div>
               <h1 className="text-2xl font-semibold text-gray-800 mb-2">Welcome{user?.name ? `, ${user.name}` : ''}</h1>
-              <p className="text-gray-600 mb-6">Here is your farmer dashboard overview.</p>
+                   <p className="text-gray-600">Here is your farmer dashboard overview.</p>
+                 </div>
+                 <button
+                   onClick={() => window.location.href = '/farm-data'}
+                   className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-700 transition-colors"
+                 >
+                   Update Farm Data
+                 </button>
+               </div>
 
               {/* Stats - Biosecurity Score, Livestock Count, Vaccination Progress */}
               <DashboardStats />
@@ -375,16 +396,140 @@ const LivestockSummaryPanel: React.FC<{ total: number }> = ({ total }) => {
 };
 
 const DashboardStats: React.FC = () => {
-  const [biosecurityScore] = React.useState<number>(76);
-  const [livestockCount] = React.useState<number>(120);
-  const [vaccinationProgress] = React.useState<number>(62);
+  const { user } = useAuth();
+  const [biosecurityScore, setBiosecurityScore] = React.useState<number>(0);
+  const [biosecurityData, setBiosecurityData] = React.useState<Record<string, number>>({});
+  const [isAssessmentComplete, setIsAssessmentComplete] = React.useState<boolean>(false);
 
-  const scoreColor = biosecurityScore >= 80 ? 'text-green-700 bg-green-50 border-green-200' : biosecurityScore >= 50 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-red-700 bg-red-50 border-red-200';
+  // Calculate dynamic livestock count and vaccination progress
+  const farmData = user?.farmData;
+  const livestock = farmData?.livestock;
+  const livestockCount = livestock ? 
+    livestock.pigs.total + livestock.poultry.total + livestock.cattle.total + livestock.goats.total : 0;
+  
+  const totalVaccinated = livestock ? 
+    livestock.pigs.vaccinated + livestock.poultry.vaccinated + livestock.cattle.vaccinated + livestock.goats.vaccinated : 0;
+  
+  const vaccinationProgress = livestockCount > 0 ? Math.round((totalVaccinated / livestockCount) * 100) : 0;
+
+  // Biosecurity assessment questions and scoring
+  const biosecurityQuestions = [
+    {
+      id: 'hygiene',
+      label: 'Hygiene',
+      questions: [
+        { id: 'cleaning', label: 'Regular cleaning schedule', maxScore: 20 },
+        { id: 'disinfection', label: 'Disinfection protocols', maxScore: 20 },
+        { id: 'waste', label: 'Waste management', maxScore: 20 }
+      ]
+    },
+    {
+      id: 'accessControl',
+      label: 'Access Control',
+      questions: [
+        { id: 'visitors', label: 'Visitor management', maxScore: 20 },
+        { id: 'equipment', label: 'Equipment disinfection', maxScore: 20 },
+        { id: 'vehicles', label: 'Vehicle control', maxScore: 20 }
+      ]
+    },
+    {
+      id: 'quarantine',
+      label: 'Quarantine',
+      questions: [
+        { id: 'newAnimals', label: 'New animal isolation', maxScore: 20 },
+        { id: 'sickAnimals', label: 'Sick animal isolation', maxScore: 20 },
+        { id: 'returningAnimals', label: 'Returning animal protocols', maxScore: 20 }
+      ]
+    },
+    {
+      id: 'pestControl',
+      label: 'Pest Control',
+      questions: [
+        { id: 'rodents', label: 'Rodent control', maxScore: 20 },
+        { id: 'wildBirds', label: 'Wild bird control', maxScore: 20 },
+        { id: 'insects', label: 'Insect control', maxScore: 20 }
+      ]
+    },
+    {
+      id: 'feedWater',
+      label: 'Feed & Water',
+      questions: [
+        { id: 'feedQuality', label: 'Feed quality control', maxScore: 20 },
+        { id: 'waterQuality', label: 'Water quality control', maxScore: 20 },
+        { id: 'storage', label: 'Proper storage', maxScore: 20 }
+      ]
+    }
+  ];
+
+  // Load saved biosecurity assessment data
+  React.useEffect(() => {
+    const savedData = localStorage.getItem('biosecurityAssessment');
+    if (savedData) {
+      const data = JSON.parse(savedData);
+      setBiosecurityData(data);
+      calculateBiosecurityScore(data);
+      setIsAssessmentComplete(true);
+    } else {
+      // Set default scores to 0 for new users
+      const defaultData: Record<string, number> = {};
+      biosecurityQuestions.forEach(category => {
+        category.questions.forEach(question => {
+          defaultData[question.id] = 0; // Start with 0 score for new users
+        });
+      });
+      console.log('Setting default biosecurity scores to 0:', defaultData);
+      setBiosecurityData(defaultData);
+      calculateBiosecurityScore(defaultData);
+    }
+  }, []);
+
+  const calculateBiosecurityScore = (data: Record<string, number>) => {
+    let totalScore = 0;
+    let maxPossibleScore = 0;
+
+    biosecurityQuestions.forEach(category => {
+      category.questions.forEach(question => {
+        totalScore += data[question.id] || 0;
+        maxPossibleScore += question.maxScore;
+      });
+    });
+
+    const percentage = Math.round((totalScore / maxPossibleScore) * 100);
+    console.log('Calculating biosecurity score:', { totalScore, maxPossibleScore, percentage, data });
+    setBiosecurityScore(percentage);
+  };
+
+  const handleAssessmentUpdate = (questionId: string, score: number) => {
+    const newData = { ...biosecurityData, [questionId]: score };
+    setBiosecurityData(newData);
+    calculateBiosecurityScore(newData);
+    localStorage.setItem('biosecurityAssessment', JSON.stringify(newData));
+    setIsAssessmentComplete(true);
+  };
+
+  const getCategoryScore = (categoryId: string) => {
+    const category = biosecurityQuestions.find(cat => cat.id === categoryId);
+    if (!category) return 0;
+    
+    let totalScore = 0;
+    let maxScore = 0;
+    
+    category.questions.forEach(question => {
+      totalScore += biosecurityData[question.id] || 0;
+      maxScore += question.maxScore;
+    });
+    
+    return Math.round((totalScore / maxScore) * 100);
+  };
+
+  const scoreColor = biosecurityScore >= 80 ? 'text-green-700 bg-green-50 border-green-200' : 
+                    biosecurityScore >= 50 ? 'text-amber-700 bg-amber-50 border-amber-200' : 
+                    'text-red-700 bg-red-50 border-red-200';
 
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Biosecurity Score (Bar Graph) */}
+        {/* Biosecurity Score (Dynamic) */}
         <div className={`p-5 rounded-lg border ${scoreColor}`}>
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium">Biosecurity Score</h3>
@@ -395,26 +540,42 @@ const DashboardStats: React.FC = () => {
           <div className="mt-3">
             <BiosecurityVerticalBarChart
               data={[
-                { label: 'Hygiene', value: 80 },
-                { label: 'Access Control', value: 72 },
-                { label: 'Quarantine', value: 65 },
-                { label: 'Pest Control', value: 58 },
-                { label: 'Waste Mgmt', value: 85 },
+                { label: 'Hygiene', value: getCategoryScore('hygiene') },
+                { label: 'Access Control', value: getCategoryScore('accessControl') },
+                { label: 'Quarantine', value: getCategoryScore('quarantine') },
+                { label: 'Pest Control', value: getCategoryScore('pestControl') },
+                { label: 'Feed & Water', value: getCategoryScore('feedWater') },
               ]}
             />
-            <div className="mt-3 text-sm font-semibold">Overall: {biosecurityScore}</div>
-            <p className="mt-1 text-xs text-gray-600">Improve lower-scoring categories to raise overall score.</p>
+            <div className="mt-3 text-sm font-semibold">Overall: {biosecurityScore}%</div>
+            <p className="mt-1 text-xs text-gray-600">
+              {biosecurityScore >= 80 ? 'Excellent biosecurity practices!' : 
+               biosecurityScore >= 50 ? 'Some improvements needed for better protection.' : 
+               'Immediate action required to improve farm biosecurity.'}
+            </p>
+
+            {/* Assessment Button */}
+            <button
+              onClick={() => window.location.href = '/risk-checker'}
+              className="mt-3 w-full bg-teal-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-700 transition-colors"
+            >
+              {isAssessmentComplete ? 'Update Assessment' : 'Take Biosecurity Assessment'}
+            </button>
 
             {/* Expandable details */}
-            <BiosecurityDetails />
+            <BiosecurityDetails 
+              biosecurityData={biosecurityData}
+              questions={biosecurityQuestions}
+              onUpdate={handleAssessmentUpdate}
+            />
           </div>
         </div>
 
-        {/* Vaccination overview (replacing current livestock in this section) */}
+        {/* Vaccination overview */}
         <LivestockOverview vaccination={vaccinationProgress} total={livestockCount} />
       </div>
 
-      {/* Livestock summary panel (replaces vaccination box) */}
+      {/* Livestock summary panel */}
       <LivestockSummaryPanel total={livestockCount} />
     </div>
   );
@@ -545,15 +706,32 @@ const VaccinationMiniTrend: React.FC<{ data: number[] }> = ({ data }) => {
 };
 
 const LivestockOverview: React.FC<{ total: number; vaccination: number }> = ({ vaccination }) => {
+  const { user } = useAuth();
+  
+  // Get farm data from user
+  const farmData = user?.farmData;
   const farm = {
-    name: 'Greenfield Dairy',
-    location: 'Nashik, MH',
-    areaAcre: 12.5,
+    name: user?.name ? `${user.name}'s Farm` : 'My Farm',
+    location: user?.village ? `${user.village}, India` : 'Location',
+    areaAcre: farmData?.totalAcres || 0,
   };
-  // Build vaccination vs remaining arcs for donut
-  const coverage = Math.max(0, Math.min(100, vaccination));
-  // No species breakdown in vaccination view
-  const trend = [48, 55, 61, 58, 64, 66, 69, 72, 74, 76, 78, vaccination];
+
+  // Calculate total livestock and vaccination data
+  const livestock = farmData?.livestock;
+  const totalLivestock = livestock ? 
+    livestock.pigs.total + livestock.poultry.total + livestock.cattle.total + livestock.goats.total : 0;
+  
+  const totalVaccinated = livestock ? 
+    livestock.pigs.vaccinated + livestock.poultry.vaccinated + livestock.cattle.vaccinated + livestock.goats.vaccinated : 0;
+  
+  const coverage = totalLivestock > 0 ? Math.round((totalVaccinated / totalLivestock) * 100) : 0;
+  
+  // Generate trend data based on current coverage
+  const trend = Array.from({ length: 12 }, (_, i) => {
+    const baseCoverage = coverage;
+    const variation = Math.random() * 10 - 5; // Random variation ±5
+    return Math.max(0, Math.min(100, baseCoverage + variation));
+  });
 
   const [hoverKey, setHoverKey] = React.useState<string | null>(null);
 
@@ -643,88 +821,102 @@ const LivestockOverview: React.FC<{ total: number; vaccination: number }> = ({ v
         </div>
       </div>
     </div>
-      {/* Recent vaccinations table */}
+      {/* Livestock Summary */}
       <div className="mt-4 bg-white/60 rounded-lg border border-blue-100">
-        <div className="px-4 py-2 text-sm font-medium text-blue-900">Last Vaccinations</div>
+        <div className="px-4 py-2 text-sm font-medium text-blue-900">Livestock Summary</div>
         <div className="overflow-x-auto">
           <table className="min-w-full text-xs">
             <thead className="bg-blue-100/60 text-blue-900">
               <tr>
-                <th className="text-left px-4 py-2 font-medium">Date</th>
-                <th className="text-left px-4 py-2 font-medium">Animal ID</th>
                 <th className="text-left px-4 py-2 font-medium">Species</th>
-                <th className="text-left px-4 py-2 font-medium">Vaccine</th>
-                <th className="text-left px-4 py-2 font-medium">Dose</th>
-                <th className="text-left px-4 py-2 font-medium">Status</th>
+                <th className="text-left px-4 py-2 font-medium">Total</th>
+                <th className="text-left px-4 py-2 font-medium">Vaccinated</th>
+                <th className="text-left px-4 py-2 font-medium">Remaining</th>
+                <th className="text-left px-4 py-2 font-medium">Coverage %</th>
               </tr>
             </thead>
             <tbody>
-              {[
-                { date: '2025-08-28', animalId: 'C-1023', species: 'Cattle', vaccine: 'FMD', dose: 'Booster', status: 'Done' },
-                { date: '2025-08-26', animalId: 'G-221', species: 'Goat', vaccine: 'PPR', dose: '1st', status: 'Done' },
-                { date: '2025-08-24', animalId: 'P-554', species: 'Poultry', vaccine: 'NDV', dose: '2nd', status: 'Pending' },
-                { date: '2025-08-20', animalId: 'B-18', species: 'Buffalo', vaccine: 'Brucellosis', dose: '1st', status: 'Done' },
-              ].map((r) => (
-                <tr key={`${r.date}-${r.animalId}`} className="border-t border-blue-100">
-                  <td className="px-4 py-2 text-blue-900">{r.date}</td>
-                  <td className="px-4 py-2 text-blue-900">{r.animalId}</td>
-                  <td className="px-4 py-2 text-blue-900">{r.species}</td>
-                  <td className="px-4 py-2 text-blue-900">{r.vaccine}</td>
-                  <td className="px-4 py-2 text-blue-900">{r.dose}</td>
+              {livestock && [
+                { species: 'Pigs', data: livestock.pigs },
+                { species: 'Poultry', data: livestock.poultry },
+                { species: 'Cattle', data: livestock.cattle },
+                { species: 'Goats', data: livestock.goats },
+              ].map((item) => {
+                const coverage = item.data.total > 0 ? Math.round((item.data.vaccinated / item.data.total) * 100) : 0;
+                const remaining = item.data.total - item.data.vaccinated;
+                return (
+                  <tr key={item.species} className="border-t border-blue-100">
+                    <td className="px-4 py-2 text-blue-900 font-medium">{item.species}</td>
+                    <td className="px-4 py-2 text-blue-900">{item.data.total}</td>
+                    <td className="px-4 py-2 text-blue-900">{item.data.vaccinated}</td>
+                    <td className="px-4 py-2 text-blue-900">{remaining}</td>
                   <td className="px-4 py-2">
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-semibold ${r.status === 'Done' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{r.status}</span>
+                      <span className={`px-2 py-1 rounded-full text-[10px] font-semibold ${
+                        coverage >= 80 ? 'bg-emerald-100 text-emerald-700' : 
+                        coverage >= 50 ? 'bg-amber-100 text-amber-700' : 
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {coverage}%
+                      </span>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
     
-      {/* Recent vaccinations table */}
-      <div className="mt-4 bg-white/60 rounded-lg border border-blue-100">
-        <div className="px-4 py-2 text-sm font-medium text-blue-900">Last Vaccinations</div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-xs">
-            <thead className="bg-blue-100/60 text-blue-900">
-              <tr>
-                <th className="text-left px-4 py-2 font-medium">Date</th>
-                <th className="text-left px-4 py-2 font-medium">Animal ID</th>
-                <th className="text-left px-4 py-2 font-medium">Species</th>
-                <th className="text-left px-4 py-2 font-medium">Vaccine</th>
-                <th className="text-left px-4 py-2 font-medium">Dose</th>
-                <th className="text-left px-4 py-2 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { date: '2025-08-28', animalId: 'C-1023', species: 'Cattle', vaccine: 'FMD', dose: 'Booster', status: 'Done' },
-                { date: '2025-08-26', animalId: 'G-221', species: 'Goat', vaccine: 'PPR', dose: '1st', status: 'Done' },
-                { date: '2025-08-24', animalId: 'P-554', species: 'Poultry', vaccine: 'NDV', dose: '2nd', status: 'Pending' },
-                { date: '2025-08-20', animalId: 'B-18', species: 'Buffalo', vaccine: 'Brucellosis', dose: '1st', status: 'Done' },
-              ].map((r) => (
-                <tr key={`${r.date}-${r.animalId}`} className="border-t border-blue-100">
-                  <td className="px-4 py-2 text-blue-900">{r.date}</td>
-                  <td className="px-4 py-2 text-blue-900">{r.animalId}</td>
-                  <td className="px-4 py-2 text-blue-900">{r.species}</td>
-                  <td className="px-4 py-2 text-blue-900">{r.vaccine}</td>
-                  <td className="px-4 py-2 text-blue-900">{r.dose}</td>
-                  <td className="px-4 py-2">
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-semibold ${r.status === 'Done' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{r.status}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      
     </div>
   );
 };
 
-const BiosecurityDetails: React.FC = () => {
+const BiosecurityDetails: React.FC<{
+  biosecurityData: Record<string, number>;
+  questions: Array<{
+    id: string;
+    label: string;
+    questions: Array<{
+      id: string;
+      label: string;
+      maxScore: number;
+    }>;
+  }>;
+  onUpdate: (questionId: string, score: number) => void;
+}> = ({ biosecurityData, questions, onUpdate }) => {
   const [open, setOpen] = React.useState(true);
-  const trend = [65, 67, 69, 70, 72, 74, 73, 75, 76];
+  const [editingQuestion, setEditingQuestion] = React.useState<string | null>(null);
+  const [editScore, setEditScore] = React.useState<number>(0);
+
+  // Generate trend data based on current score
+  const generateTrendData = () => {
+    const baseScore = Math.max(0, Math.min(100, biosecurityData ? 
+      Object.values(biosecurityData).reduce((sum, score) => sum + score, 0) / Object.keys(biosecurityData).length : 0));
+    
+    return Array.from({ length: 9 }, (_, i) => {
+      const variation = Math.random() * 10 - 5; // Random variation ±5
+      return Math.max(0, Math.min(100, baseScore + variation));
+    });
+  };
+
+  const trend = generateTrendData();
+
+  const handleEdit = (questionId: string, currentScore: number) => {
+    setEditingQuestion(questionId);
+    setEditScore(currentScore);
+  };
+
+  const handleSave = (questionId: string) => {
+    onUpdate(questionId, editScore);
+    setEditingQuestion(null);
+    setEditScore(0);
+  };
+
+  const handleCancel = () => {
+    setEditingQuestion(null);
+    setEditScore(0);
+  };
 
   return (
     <div className="mt-4 border-t border-gray-100 pt-3">
@@ -740,54 +932,82 @@ const BiosecurityDetails: React.FC = () => {
           <div className="bg-white/70 border border-gray-100 rounded-lg p-3">
             <div className="text-xs text-gray-700 mb-2 font-medium">Category Strength</div>
             <div className="space-y-2">
-              {[
-                { k: 'Hygiene', v: 80, c: 'bg-emerald-500' },
-                { k: 'Access Control', v: 72, c: 'bg-blue-500' },
-                { k: 'Quarantine', v: 65, c: 'bg-amber-500' },
-                { k: 'Pest Control', v: 58, c: 'bg-red-500' },
-                { k: 'Waste Mgmt', v: 85, c: 'bg-indigo-500' },
-              ].map((row) => (
-                <div key={row.k} className="text-xs text-gray-700">
+              {questions.map((category) => {
+                const categoryScore = category.questions.reduce((sum, q) => sum + (biosecurityData[q.id] || 0), 0);
+                const maxScore = category.questions.reduce((sum, q) => sum + q.maxScore, 0);
+                const percentage = Math.round((categoryScore / maxScore) * 100);
+                
+                let colorClass = 'bg-red-500';
+                if (percentage >= 80) colorClass = 'bg-emerald-500';
+                else if (percentage >= 50) colorClass = 'bg-amber-500';
+
+                return (
+                  <div key={category.id} className="text-xs text-gray-700">
                   <div className="flex items-center justify-between">
-                    <span>{row.k}</span>
-                    <span className="font-medium">{row.v}</span>
+                      <span>{category.label}</span>
+                      <span className="font-medium">{percentage}%</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden mt-1">
-                    <div className={`h-full ${row.c}`} style={{ width: `${row.v}%` }} />
+                      <div className={`h-full ${colorClass}`} style={{ width: `${percentage}%` }} />
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
           <div className="md:col-span-2 bg-white/70 border border-gray-100 rounded-lg p-3">
-            <div className="text-xs text-gray-700 mb-2 font-medium">Recommended Actions</div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-xs">
-                <thead className="text-gray-700">
-                  <tr>
-                    <th className="text-left py-2">Area</th>
-                    <th className="text-left py-2">Action</th>
-                    <th className="text-left py-2">Priority</th>
-                    <th className="text-left py-2">ETA</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { area: 'Pest Control', action: 'Schedule rodent control', pr: 'High', eta: '2 days' },
-                    { area: 'Quarantine', action: 'Update isolation signage', pr: 'Medium', eta: '1 week' },
-                    { area: 'Access Control', action: 'Rotate passwords / badges', pr: 'Low', eta: '2 weeks' },
-                  ].map((r, idx) => (
-                    <tr key={idx} className="border-t border-gray-100">
-                      <td className="py-2">{r.area}</td>
-                      <td className="py-2">{r.action}</td>
-                      <td className="py-2">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.pr === 'High' ? 'bg-red-100 text-red-700' : r.pr === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>{r.pr}</span>
-                      </td>
-                      <td className="py-2">{r.eta}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="text-xs text-gray-700 mb-2 font-medium">Detailed Assessment</div>
+            <div className="space-y-3">
+              {questions.map((category) => (
+                <div key={category.id} className="border-l-2 border-teal-200 pl-3">
+                  <div className="text-xs font-medium text-gray-800 mb-2">{category.label}</div>
+                  <div className="space-y-2">
+                    {category.questions.map((question) => (
+                      <div key={question.id} className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600">{question.label}</span>
+                        <div className="flex items-center space-x-2">
+                          {editingQuestion === question.id ? (
+                            <>
+                              <input
+                                type="number"
+                                min="0"
+                                max={question.maxScore}
+                                value={editScore}
+                                onChange={(e) => setEditScore(Number(e.target.value))}
+                                className="w-16 px-2 py-1 text-xs border rounded"
+                              />
+                              <button
+                                onClick={() => handleSave(question.id)}
+                                className="text-green-600 hover:text-green-800"
+                              >
+                                ✓
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                ✕
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-medium">
+                                {biosecurityData[question.id] || 0}/{question.maxScore}
+                              </span>
+                              <button
+                                onClick={() => handleEdit(question.id, biosecurityData[question.id] || 0)}
+                                className="text-teal-600 hover:text-teal-800 ml-2"
+                              >
+                                ✏️
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

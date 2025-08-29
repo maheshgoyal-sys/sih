@@ -10,6 +10,8 @@ const Signup = () => {
     email: '',
     phone: '',
     address: '',
+    aadhaarNumber: '',
+    village: '',
     password: '',
     confirmPassword: ''
   });
@@ -30,8 +32,15 @@ const Signup = () => {
     setError('');
 
     // Validate form fields
-    if (!formData.name || !formData.email || !formData.phone || !formData.address || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.address || !formData.aadhaarNumber || !formData.village || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all required fields');
+      return;
+    }
+
+    // Validate Aadhaar number format (12 digits)
+    const aadhaarRegex = /^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$/;
+    if (!aadhaarRegex.test(formData.aadhaarNumber)) {
+      setError('Please enter a valid 12-digit Aadhaar number');
       return;
     }
 
@@ -46,7 +55,7 @@ const Signup = () => {
     }
 
     try {
-      const { name, email, phone, address, password } = formData;
+      const { name, email, phone, address, aadhaarNumber, village, password } = formData;
       console.log('Attempting to register user:', { name, email, phone });
       
       await authAPI.register({
@@ -54,6 +63,8 @@ const Signup = () => {
         email,
         phone,
         address,
+        aadhaarNumber,
+        village,
         password
       });
       
@@ -197,6 +208,82 @@ const Signup = () => {
                   placeholder={t('auth.address')}
                   value={formData.address}
                   onChange={(e) => setFormData({...formData, address: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="aadhaarNumber" className="sr-only">
+                Aadhaar Number
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="aadhaarNumber"
+                  name="aadhaarNumber"
+                  type="text"
+                  required
+                  maxLength={12}
+                  className={`appearance-none relative block w-full px-3 py-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:z-10 sm:text-sm ${
+                    formData.aadhaarNumber.length === 12 
+                      ? /^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$/.test(formData.aadhaarNumber)
+                        ? 'border-green-500 focus:ring-green-500 focus:border-green-500'
+                        : 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-teal-500 focus:border-teal-500'
+                  }`}
+                  placeholder="Aadhaar Number (12 digits)"
+                  value={formData.aadhaarNumber}
+                  onChange={(e) => {
+                    // Only allow numbers
+                    const value = e.target.value.replace(/\D/g, '');
+                    setFormData({...formData, aadhaarNumber: value});
+                  }}
+                />
+                {formData.aadhaarNumber.length > 0 && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    {formData.aadhaarNumber.length === 12 && /^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$/.test(formData.aadhaarNumber) ? (
+                      <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    ) : formData.aadhaarNumber.length === 12 ? (
+                      <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+              {formData.aadhaarNumber.length > 0 && formData.aadhaarNumber.length < 12 && (
+                <p className="mt-1 text-sm text-gray-500">
+                  {12 - formData.aadhaarNumber.length} digits remaining
+                </p>
+              )}
+              {formData.aadhaarNumber.length === 12 && !/^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$/.test(formData.aadhaarNumber) && (
+                <p className="mt-1 text-sm text-red-600">
+                  Invalid Aadhaar number format. Must start with 2-9 and be exactly 12 digits.
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="village" className="sr-only">
+                Village Name
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Home className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="village"
+                  name="village"
+                  type="text"
+                  required
+                  className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                  placeholder="Village Name"
+                  value={formData.village}
+                  onChange={(e) => setFormData({...formData, village: e.target.value})}
                 />
               </div>
             </div>

@@ -3,12 +3,33 @@ import axios from 'axios';
 const API_URL = 'http://localhost:3001/api';
 
 // Type definitions for API responses
+export interface LivestockData {
+  total: number;
+  vaccinated: number;
+}
+
+export interface FarmData {
+  totalAcres: number;
+  livestock: {
+    pigs: LivestockData;
+    poultry: LivestockData;
+    cattle: LivestockData;
+    goats: LivestockData;
+  };
+}
+
 export interface User {
   _id: string;
   name: string;
   email: string;
+  phone: string;
+  address: string;
+  aadhaarNumber: string;
+  village: string;
+  farmData?: FarmData;
   role?: string;
   token?: string;
+  createdAt?: string;
 }
 
 // Create axios instance
@@ -36,8 +57,10 @@ api.interceptors.request.use(
 export const authAPI = {
   // Get user profile
   getProfile: async (): Promise<User> => {
-    const response = await api.get<User>('/auth/profile');
-    return response.data;
+    console.log('API - Getting profile...');
+    const response = await api.get<{ user: User }>('/auth/profile');
+    console.log('API - Profile response:', response.data);
+    return response.data.user;
   },
 
   // Register a new user
@@ -46,6 +69,8 @@ export const authAPI = {
     email: string;
     phone: string;
     address: string;
+    aadhaarNumber: string;
+    village: string;
     password: string;
   }): Promise<{ user: User; token: string }> => {
     const response = await api.post<{ user: User; token: string }>('/auth/register', userData);
@@ -70,6 +95,12 @@ export const authAPI = {
   logout: async (): Promise<void> => {
     localStorage.removeItem('token');
     await api.post('/auth/logout');
+  },
+
+  // Update farm data
+  updateFarmData: async (farmData: FarmData): Promise<User> => {
+    const response = await api.put<{ user: User }>('/auth/farm-data', { farmData });
+    return response.data.user;
   },
 };
 

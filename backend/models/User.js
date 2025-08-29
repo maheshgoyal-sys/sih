@@ -29,6 +29,43 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please provide an address'],
     trim: true
   },
+  aadhaarNumber: {
+    type: String,
+    required: [true, 'Please provide Aadhaar number'],
+    match: [/^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$/, 'Please provide a valid 12-digit Aadhaar number'],
+    unique: true
+  },
+  village: {
+    type: String,
+    required: [true, 'Please provide your village name'],
+    trim: true
+  },
+  // Farm data
+  farmData: {
+    totalAcres: {
+      type: Number,
+      default: 0,
+      min: [0, 'Total acres cannot be negative']
+    },
+    livestock: {
+      pigs: {
+        total: { type: Number, default: 0, min: 0 },
+        vaccinated: { type: Number, default: 0, min: 0 }
+      },
+      poultry: {
+        total: { type: Number, default: 0, min: 0 },
+        vaccinated: { type: Number, default: 0, min: 0 }
+      },
+      cattle: {
+        total: { type: Number, default: 0, min: 0 },
+        vaccinated: { type: Number, default: 0, min: 0 }
+      },
+      goats: {
+        total: { type: Number, default: 0, min: 0 },
+        vaccinated: { type: Number, default: 0, min: 0 }
+      }
+    }
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],

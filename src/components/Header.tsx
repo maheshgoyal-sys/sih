@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Shield, Globe } from 'lucide-react';
+import { Menu, X, Shield, Globe, User } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { language, toggleLanguage, t } = useLanguage();
+  const { isAuthenticated, user } = useAuth();
 
   const navItems = [
     { path: '/risk-checker', label: t('nav.risk-checker') },
@@ -59,12 +61,22 @@ const Header = () => {
               <Globe className="h-4 w-4" />
               <span>{language === 'en' ? 'हिं' : 'EN'}</span>
             </button>
-            <Link
-              to="/login"
-              className="bg-gradient-to-r from-teal-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:shadow-lg transition-all duration-200 hover:scale-105"
-            >
-              {t('auth.login')} / {t('auth.signup')}
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to="/farmer"
+                className="flex items-center space-x-2 bg-gradient-to-r from-teal-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:shadow-lg transition-all duration-200 hover:scale-105"
+              >
+                <User className="h-4 w-4" />
+                <span>{user?.name || 'Farmer'}</span>
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="bg-gradient-to-r from-teal-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:shadow-lg transition-all duration-200 hover:scale-105"
+              >
+                {t('auth.login')} / {t('auth.signup')}
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -102,13 +114,24 @@ const Header = () => {
                   <Globe className="h-4 w-4" />
                   <span>{language === 'en' ? 'हिंदी' : 'English'}</span>
                 </button>
-                <Link
-                  to="/risk-checker"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="bg-gradient-to-r from-teal-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
-                >
-                  {t('cta.check-risk')}
-                </Link>
+                {isAuthenticated ? (
+                  <Link
+                    to="/farmer"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center space-x-2 bg-gradient-to-r from-teal-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>{user?.name || 'Farmer'}</span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/risk-checker"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="bg-gradient-to-r from-teal-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
+                  >
+                    {t('cta.check-risk')}
+                  </Link>
+                )}
               </div>
             </div>
           </div>

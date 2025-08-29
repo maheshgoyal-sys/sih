@@ -15,9 +15,11 @@ import Contact from './pages/Contact';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Resources from './pages/Resources';
-import RiskChecker from './pages/RiskChecker';
+import BiosecurityAssessment from './pages/BiosecurityAssessment';
 import Signup from './pages/Signup';
 import Training from './pages/Training';
+import UserProfile from './pages/UserProfile';
+import FarmData from './pages/FarmData';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -67,7 +69,7 @@ function App() {
                   path="/risk-checker"
                   element={
                     <ProtectedRoute>
-                      <RiskChecker />
+                      <BiosecurityAssessment />
                     </ProtectedRoute>
                   }
                 />
@@ -140,6 +142,22 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <FarmerDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <UserProfile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/farm-data"
+                  element={
+                    <ProtectedRoute>
+                      <FarmData />
                     </ProtectedRoute>
                   }
                 />

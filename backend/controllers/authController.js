@@ -22,7 +22,7 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, phone, address, password } = req.body;
+    const { name, email, phone, address, aadhaarNumber, village, password } = req.body;
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
@@ -30,8 +30,22 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Check if Aadhaar number already exists
+    const aadhaarExists = await User.findOne({ aadhaarNumber });
+    if (aadhaarExists) {
+      return res.status(400).json({ message: 'Aadhaar number already registered' });
+    }
+
     // Create user
-    const user = await User.create({ name, email, phone, address, password });
+    const user = await User.create({ 
+      name, 
+      email, 
+      phone, 
+      address, 
+      aadhaarNumber, 
+      village, 
+      password 
+    });
 
     if (user) {
       const token = generateToken(user._id);
@@ -49,6 +63,10 @@ exports.register = async (req, res, next) => {
           _id: user._id,
           name: user.name,
           email: user.email,
+          phone: user.phone,
+          address: user.address,
+          aadhaarNumber: user.aadhaarNumber,
+          village: user.village,
           role: user.role,
         },
         token,
@@ -57,7 +75,27 @@ exports.register = async (req, res, next) => {
       res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
-    next(error);
+    // Handle specific validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        message: 'Validation failed', 
+        errors: validationErrors 
+      });
+    }
+    
+    // Handle duplicate key errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyValue)[0];
+      const fieldName = field === 'aadhaarNumber' ? 'Aadhaar number' : field;
+      return res.status(400).json({ 
+        message: `${fieldName} already exists` 
+      });
+    }
+    
+    // Handle other errors
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -87,6 +125,11 @@ exports.login = async (req, res, next) => {
           _id: user._id,
           name: user.name,
           email: user.email,
+          phone: user.phone,
+          address: user.address,
+          aadhaarNumber: user.aadhaarNumber,
+          village: user.village,
+          farmData: user.farmData,
           role: user.role,
         },
         token,
@@ -121,7 +164,60 @@ exports.getUserProfile = async (req, res, next) => {
 
     const user = await User.findById(req.user.id).select('-password');
     if (user) {
-      res.json({ user });
+      res.json({
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          address: user.address,
+          aadhaarNumber: user.aadhaarNumber,
+          village: user.village,
+          farmData: user.farmData,
+          role: user.role,
+          createdAt: user.createdAt
+        }
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update farm data
+// @route   PUT /api/auth/farm-data
+// @access  Private
+exports.updateFarmData = async (req, res, next) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const { farmData } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { farmData },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (user) {
+      res.json({
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          address: user.address,
+          aadhaarNumber: user.aadhaarNumber,
+          village: user.village,
+          farmData: user.farmData,
+          role: user.role,
+          createdAt: user.createdAt
+        }
+      });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
